@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Weather App</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f0f0f0;
+        }
+        .card {
+            height: 90vh;
+            width: 70vh;
+            max-width: 100%;
+            margin-top: 25px;
+            background: linear-gradient(to right, orange, yellow);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-radius: 10px;
+            position: relative;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .search {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .search button {
+            height: 59px;
+            width: 15%;
+            border-radius: 50px;
+            position: absolute;
+            margin-right: -360px;
+            cursor: pointer;
+            background-color: white;
+            border: none;
+            margin-top: 3px;
+        }
+        .search button img {
+            height: 30px;
+        }
+        .search button:hover{
+            background-color: rgb(179, 177, 177);
+        }
+        .is {
+            height: 48px;
+            width: 80%;
+            border: none;
+            border-radius: 50px;
+            padding: 7px;
+            font-size: 16px;
+            margin-left: -70px;
+        }
+        .images img {
+            max-height: 220px;
+            max-width: 220px;
+            height: auto;
+            width: auto;
+            margin-bottom: 20px;
+            margin-top: -38px;
+        }
+        .city {
+            font-size: 35px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: rgb(139, 92, 4);
+            font-weight: bolder;
+            margin-top: -30px;
+        }
+        .weather {
+            text-align: center;
+        }
+        .weather h1 {
+            font-size: 30px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: rgb(139, 92, 4);
+            margin: 0;
+        }
+        .weather p {
+            font-size: 65px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: rgb(139, 92, 4);
+            margin: 2px 0 0;
+        }
+        footer {
+            height: 100px;
+            max-width: 110%;
+            width: 70vh;
+            background-color: rgb(187, 127, 9);
+            margin-top: auto;
+            border-radius: 0 0 10px 10px;
+            margin-bottom: -20px;
+        }
+        .wind {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: rgb(65, 33, 4);
+            padding: 10px 9px;
+            margin: -15px;
+            margin-left: 10px;
+        }
+        .wind p {
+            margin-top: -20px;
+            font-size: 18px;
+            margin-left: 5px;
+        }
+        .feels {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: rgb(65, 33, 4);
+            padding: 10px 9px;
+            margin: -15px;
+            margin-top: -128px;
+            margin-left: 200px;
+        }
+        .feels p {
+            margin-top: -20px;
+            font-size: 18px;
+            margin-left: 5px;
+        }
+        .humidity {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: rgb(65, 33, 4);
+            padding: 10px 9px;
+            margin: -15px;
+            margin-top: -128px;
+            margin-left: 350px;
+        }
+        .humidity p {
+            margin-top: -20px;
+            font-size: 18px;
+            margin-left: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div id="searchbar" class="search">
+            <input class="is" placeholder="Search your city">
+            <button><img src="images/search.png" alt="Search"></button>
+        </div>
+        <div class="images">
+            <img src="images/mist.png" alt="Weather Icon" class="weather-icon">
+        </div>
+        <div class="city">Karachi</div>
+        <div class="weather">
+            <h1 class="wthr">Sunny</h1>
+            <p class="temp">22°C</p>
+        </div>
+        <footer>
+            <div class="wind">
+                <h1 class="windspeed">11MPH</h1>
+                <p>Wind</p>
+            </div>
+            <div class="feels">
+                <h1 class="feel">18°</h1>
+                <p>Feels like</p>
+            </div>
+            <div class="humidity">
+                <h1 class="humid">68%</h1>
+                <p>Humidity</p>
+            </div>
+        </footer>
+    </div>
+    <script>
+        const apiKey = "b30e14c2c7e979a751446a4eec43bf99";
+        const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&appid=" + apiKey + "&q=";
+        const searchBox = document.querySelector(".search input");
+        const searchBtn = document.querySelector(".search button");
+
+
+        async function checkWeather(city) {
+            if (!city) {
+                alert("Please enter a city name");
+                return;
+            }
+
+            try {
+                const response = await fetch(apiUrl + city);
+                const data = await response.json();
+
+                if (data.cod === 200) {
+                    document.querySelector(".city").innerHTML = data.name;
+                    document.querySelector(".wthr").innerHTML = data.weather[0].main;
+                    document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°C";
+                    document.querySelector(".windspeed").innerHTML = data.wind.speed + "m/s";
+                    document.querySelector(".feel").innerHTML = Math.round(data.main.feels_like) + "°";
+                    document.querySelector(".humid").innerHTML = data.main.humidity + "%";
+
+                    checkConditions(data.weather[0].main);
+                } else {
+                    alert("City not found: " + data.message);
+                }
+            } catch (error) {
+                console.log("Error fetching the weather data", error);
+                alert("Error fetching the weather data. Please try again later.");
+            }
+        }
+
+        function checkConditions(weather){
+            const weatherIcon = document.querySelector(".weather-icon");
+            const Card = document.querySelector(".card");
+            if(weather === "Clear"){
+                weatherIcon.src = "images/clear.png";
+                Card.style.background = "linear-gradient(to right, #87ceeb, #00bfff)";
+
+
+            }
+           
+            else if(weather === "Clouds"){
+                weatherIcon.src = "images/clouds.png";
+                Card.style.background= "linear-gradient(to right, #f0f0f0, #d0d0d0, #f0f0f0)";
+
+
+
+            }
+            else if(weather === "Drizzle"){
+                weatherIcon.src = "images/drizzle.png";
+                Card.style.background= "linear-gradient(to right, #d0d0d0, #c0c0c0, #e0e0e0)";
+
+            }
+            else if(weather === "Mist"){
+                weatherIcon.src = "images/mist.png";
+                Card.style.background= "linear-gradient(to right, #e0e0e0, #f5f5f5)";
+
+            }
+            else if(weather === "Rain"){
+                weatherIcon.src = "images/rain.png";
+                Card.style.background= "linear-gradient(to right, #6e6e6e, #b0b0b0)";
+
+            }
+            else if(weather === "Snow"){
+                weatherIcon.src = "images/snow.png";
+                Card.style.background= "linear-gradient(to right, #e0f7fa, #ffffff)";
+
+            }
+
+            else if(weather === "Smoke"){
+                weatherIcon.src = "images/smoke2.png";
+                Card.style.background= "linear-gradient(to right, #b0b0b0, #d0d0d0, #f0f0f0)";
+
+            }
+        }
+
+        function initialize() {
+            // Set Karachi's weather when the page loads
+            checkWeather("Karachi");
+        }
+        
+
+        searchBtn.addEventListener("click", () => {
+            const city = searchBox.value.trim();
+            console.log("Search button clicked. City:", city);
+            checkWeather(city);
+        });
+
+        initialize();
+    </script>
+</body>
+</html>
